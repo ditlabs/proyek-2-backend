@@ -1,0 +1,73 @@
+package services
+
+import (
+	"backend-sarpras/models"
+	"backend-sarpras/repositories"
+	"errors"
+)
+
+type KehadiranService struct {
+	KehadiranRepo  *repositories.KehadiranRepository
+	PeminjamanRepo *repositories.PeminjamanRepository
+	LogRepo        *repositories.LogAktivitasRepository
+}
+
+func NewKehadiranService(
+	kehadiranRepo *repositories.KehadiranRepository,
+	peminjamanRepo *repositories.PeminjamanRepository,
+	logRepo *repositories.LogAktivitasRepository,
+) *KehadiranService {
+	return &KehadiranService{
+		KehadiranRepo:  kehadiranRepo,
+		PeminjamanRepo: peminjamanRepo,
+		LogRepo:        logRepo,
+	}
+}
+
+func (s *KehadiranService) CreateKehadiran(req *models.CreateKehadiranRequest, securityKode string) error {
+	peminjaman, err := s.PeminjamanRepo.GetByID(req.KodePeminjaman)
+	if err != nil {
+		return err
+	}
+	if peminjaman == nil {
+		return errors.New("peminjaman tidak ditemukan")
+	}
+
+	if peminjaman.Status != models.StatusPeminjamanApproved {
+		return errors.New("peminjaman belum disetujui")
+	}
+
+	existing, _ := s.KehadiranRepo.GetByPeminjamanID(req.KodePeminjaman)
+	if existing != nil {
+		return errors.New("kehadiran sudah pernah diisi")
+	}
+
+	if req.StatusKehadiran != models.KehadiranHadir &&
+		req.StatusKehadiran != models.KehadiranTidakHadir &&
+		req.StatusKehadiran != models.KehadiranBatal {
+		return errors.New("status kehadiran tidak valid")
+	}
+
+	kehadiran := &models.KehadiranPeminjam{
+		KodeKehadiran:    generateCode("KHD"),
+		KodePeminjaman:   req.KodePeminjaman,
+		StatusKehadiran:  req.StatusKehadiran,
+		Keterangan:       req.Keterangan,
+		DiverifikasiOleh: &securityKode,
+	}
+
+	if err := s.KehadiranRepo.Create(kehadiran); err != nil {
+		return err
+	}
+
+	s.LogRepo.Create(&models.LogAktivitas{
+		KodeLog:        generateCode("LOG"),
+		KodeUser:       &securityKode,
+		KodePeminjaman: &req.KodePeminjaman,
+		Aksi:           "UPDATE_KEHADIRAN",
+		Keterangan:     "Status kehadiran: " + string(req.StatusKehadiran),
+	})
+
+	return nil
+}
+
