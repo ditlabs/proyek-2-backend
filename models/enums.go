@@ -14,10 +14,8 @@ const (
 type JenisOrganisasiEnum string
 
 const (
-	JenisOrganisasiHMJ JenisOrganisasiEnum = "HMJ"
-	JenisOrganisasiUKM JenisOrganisasiEnum = "UKM"
-	JenisOrganisasiBEM JenisOrganisasiEnum = "BEM"
-	JenisOrganisasiMPM JenisOrganisasiEnum = "MPM"
+	JenisOrganisasiORMAWA JenisOrganisasiEnum = "ORMAWA"
+	JenisOrganisasiUKM    JenisOrganisasiEnum = "UKM"
 )
 
 // PeminjamanStatusEnum mengikuti enum peminjaman_status_enum di database.
@@ -44,9 +42,9 @@ const (
 type NotifikasiJenisEnum string
 
 const (
-	NotifPengajuanDibuat  NotifikasiJenisEnum = "PENGAJUAN_DIBUAT"
-	NotifStatusApproved   NotifikasiJenisEnum = "STATUS_APPROVED"
-	NotifStatusRejected   NotifikasiJenisEnum = "STATUS_REJECTED"
+	NotifPengajuanDibuat   NotifikasiJenisEnum = "PENGAJUAN_DIBUAT"
+	NotifStatusApproved    NotifikasiJenisEnum = "STATUS_APPROVED"
+	NotifStatusRejected    NotifikasiJenisEnum = "STATUS_REJECTED"
 	NotifReminderKehadiran NotifikasiJenisEnum = "REMINDER_KEHADIRAN"
 )
 
@@ -58,5 +56,3 @@ const (
 	KehadiranTidakHadir KehadiranStatusEnum = "TIDAK_HADIR"
 	KehadiranBatal      KehadiranStatusEnum = "BATAL"
 )
-
-
